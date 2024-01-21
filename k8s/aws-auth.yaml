@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::333584274316:role/CodeBuildEKSRole
+      username: build
+      groups:
+        - system:masters
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: arn:aws:iam::333584274316:role/eksctl-three-tier-cluster-nodegrou-NodeInstanceRole-OJ8SzGs1BbBL
+      username: system:node:{{EC2PrivateDNSName}}
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2024-01-15T08:51:15Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "1887442"
+  uid: fc9449af-f4d7-442d-ba7f-d1d63134f71b
