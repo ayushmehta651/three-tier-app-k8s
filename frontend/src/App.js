@@ -26,7 +26,7 @@ class App extends Tasks {
                                 placeholder="Add New TO-DO"
                             />
                             <Button className="add-task-btn" color="primary" variant="outlined" type="submit">
-                                Add Tasks
+                                Add Task
                             </Button>
                         </form>
                         <div className="tasks-list">
