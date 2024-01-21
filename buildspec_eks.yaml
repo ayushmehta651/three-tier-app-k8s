@@ -13,8 +13,9 @@ phases:
       - source ~/.bashrc
       - echo 'Check kubectl version'
       - kubectl version --short --client
-      - chmod +x eks_cicd/prereqs.sh
-      - sh eks_cicd/prereqs.sh
+      - git checkout main
+      - chmod +x k8s/prereqs.sh
+      - sh k8s/prereqs.sh
 
   pre_build:
     commands:
@@ -23,25 +24,25 @@ phases:
       - echo check config 
       - kubectl config view --minify
       - echo check kubectl access
-      - kubectl get svc
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-      - docker pull $REPOSITORY_URI:$IMAGE_TAG
-      
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q3f0e3u9
+
 
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...          
-      - docker build --cache-from $REPOSITORY_URI:$IMAGE_TAG -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG 
+      - echo Building the Docker image...   
+      - cd backend
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG public.ecr.aws/q3f0e3u9/$IMAGE_REPO_NAME:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push public.ecr.aws/q3f0e3u9/$IMAGE_REPO_NAME:$IMAGE_TAG
       - echo Push the latest image to cluster
-      - kubectl apply -f eks_cicd/deployment.yaml
-      - kubectl rollout restart -f eks_cicd/deployment.yaml
+      - cd ..
+      - cd k8s/backend
+      - kubectl apply -f deploy.yaml
+      - kubectl rollout restart -f deploy.yaml
