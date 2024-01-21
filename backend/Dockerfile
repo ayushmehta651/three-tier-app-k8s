@@ -1,4 +1,4 @@
-FROM node:14
+FROM public.ecr.aws/docker/library/node:lts-iron
 
 WORKDIR /app
 
