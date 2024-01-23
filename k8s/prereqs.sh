@@ -59,5 +59,35 @@ else
 	echo 'kubectx already installed'
 fi
 
+# jq
+# Function to check if a command is available
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Install jq if not already installed
+if ! command_exists jq; then
+  echo "jq not found. Installing jq..."
+  
+  # Check if the system is Debian/Ubuntu-based
+  if command_exists apt-get; then
+    sudo apt-get update
+    sudo apt-get install -y jq
+
+  # Check if the system is Red Hat/Fedora-based
+  elif command_exists yum; then
+    sudo yum install -y jq
+
+  # Check if the system is macOS with Homebrew
+  elif command_exists brew; then
+    brew install jq
+
+  # For other systems, you might need to provide instructions or use alternative methods
+  else
+    echo "jq installation not supported on this system. Please install jq manually."
+    exit 1
+  fi
+fi
+
 # Test if AWS credentials exist
 aws sts get-caller-identity
